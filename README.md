@@ -48,7 +48,7 @@ cd backend
 mvn clean install
 \`\`\`
 
-Configure MySQL database in `src/main/resources/application.properties`:
+Configure MySQL database in \`src/main/resources/application.properties\`:
 \`\`\`
 spring.datasource.url=jdbc:mysql://localhost:3306/complaintdb
 spring.datasource.username=root
@@ -73,9 +73,23 @@ Backend runs at http://localhost:8080
 
 ---
 
+## H2 Console
+
+You can access the H2 database console (for testing or inspecting data) at:
+
+\`\`\`
+http://localhost:8080/h2-console
+\`\`\`
+
+- JDBC URL: \`jdbc:h2:mem:testdb\` (or your configured database)  
+- Username: \`sa\`  
+- Password: leave blank by default  
+
+---
+
 ## API Endpoint
 
-You can access the complaints data in JSON format at:
+Access complaints data in JSON format at:
 
 \`\`\`
 http://localhost:8080/api/complaints
@@ -145,4 +159,3 @@ MIT License
 Harini L  
 GitHub: https://github.com/Harini410  
 LinkedIn: https://www.linkedin.com/in/harini-lakshmanan-04
-
