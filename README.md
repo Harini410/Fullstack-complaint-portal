@@ -81,7 +81,7 @@ You can access the H2 database console (for testing or inspecting data) at:
 http://localhost:8080/h2-console
 \`\`\`
 
-- JDBC URL: \`jdbc:h2:mem:testdb\` (or your configured database)  
+- JDBC URL: \`jdbc:h2:mem:complaintdb\` (or your configured database)  
 - Username: \`sa\`  
 - Password: leave blank by default  
 
