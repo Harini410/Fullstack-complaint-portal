@@ -131,13 +131,6 @@ Fullstack-complaint-portal/
 
 ---
 
-## Screenshots (Optional)
-- Login Page  
-- Complaint Dashboard  
-- Admin Panel  
-
----
-
 ## Future Enhancements
 - Email/SMS notifications for status updates  
 - Analytics dashboard for complaint insights  
