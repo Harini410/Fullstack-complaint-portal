@@ -1,3 +1,4 @@
+
 package com.example.complaintbackend;
 
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers("/h2-console/**", "/api/**") // disable CSRF for H2 + API
             )
