@@ -4,31 +4,30 @@ function App() {
   const [complaints, setComplaints] = useState([]);
   const [newComplaint, setNewComplaint] = useState("");
 
-  // ✅ Fetch complaints from backend
   useEffect(() => {
     fetch("http://localhost:8080/api/complaints")
       .then((res) => {
-        console.log("Response status:", res.status);
         if (!res.ok) {
           throw new Error("Failed to fetch complaints");
         }
         return res.json();
       })
       .then((data) => {
-        console.log("Fetched complaints:", data);
         setComplaints(data);
       })
       .catch((err) => console.error("Error fetching complaints:", err));
   }, []);
 
-  // ✅ Submit new complaint
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!newComplaint.trim()) return;
 
     fetch("http://localhost:8080/api/complaints", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         description: newComplaint,
         category: "General",
@@ -42,19 +41,32 @@ function App() {
         return res.json();
       })
       .then((data) => {
-        console.log("Added complaint:", data);
         setComplaints((prev) => [...prev, data]);
+        setNewComplaint("");
       })
       .catch((err) => console.error("Error submitting complaint:", err));
+  };
 
-    setNewComplaint("");
+  const handleDelete = (id) => {
+    fetch("http://localhost:8080/api/complaints/" + id, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to delete complaint");
+        }
+
+        setComplaints((prev) =>
+          prev.filter((complaint) => complaint.id !== id)
+        );
+      })
+      .catch((err) => console.error("Error deleting complaint:", err));
   };
 
   return (
     <div style={{ margin: "2rem", fontFamily: "Arial, sans-serif" }}>
       <h1>Complaint Portal</h1>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} style={{ marginBottom: "1.5rem" }}>
         <input
           type="text"
@@ -69,6 +81,7 @@ function App() {
             border: "1px solid #ccc",
           }}
         />
+
         <button
           type="submit"
           style={{
@@ -84,8 +97,8 @@ function App() {
         </button>
       </form>
 
-      {/* Complaints Table */}
       <h2>Complaints List</h2>
+
       {complaints.length === 0 ? (
         <p>No complaints available.</p>
       ) : (
@@ -99,7 +112,9 @@ function App() {
         >
           <thead>
             <tr style={{ backgroundColor: "#007bff", color: "white" }}>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>ID</th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                ID
+              </th>
               <th style={{ border: "1px solid #ddd", padding: "8px" }}>
                 Category
               </th>
@@ -109,22 +124,35 @@ function App() {
               <th style={{ border: "1px solid #ddd", padding: "8px" }}>
                 Status
               </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Action
+              </th>
             </tr>
           </thead>
+
           <tbody>
             {complaints.map((c) => (
               <tr key={c.id}>
                 <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                   {c.id}
                 </td>
+
                 <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                   {c.category}
                 </td>
+
                 <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                   {c.description}
                 </td>
+
                 <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                   {c.status}
+                </td>
+
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  <button onClick={() => handleDelete(c.id)}>
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
