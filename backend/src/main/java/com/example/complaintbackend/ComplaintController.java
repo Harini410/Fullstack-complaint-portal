@@ -1,3 +1,4 @@
+
 package com.example.complaintbackend;
 
 import org.springframework.web.bind.annotation.*;
@@ -35,4 +36,10 @@ public class ComplaintController {
                     return repository.save(c);
                 }).orElseThrow(() -> new RuntimeException("Complaint not found"));
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteComplaint(@PathVariable Long id) {
+        repository.deleteById(id);
+    }
 }
+
