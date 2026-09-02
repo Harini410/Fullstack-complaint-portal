@@ -87,6 +87,10 @@ table th {
   color: white;
 }
 
+table tr {
+  transition: background 0.2s ease;
+}
+
 table tr:nth-child(even) {
   background: #f9f9f9;
 }
