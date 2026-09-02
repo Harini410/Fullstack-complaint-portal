@@ -68,8 +68,8 @@ npm install
 npm start
 \`\`\`
 
-Frontend runs at http://localhost:3000  
-Backend runs at http://localhost:8080  
+Frontend runs at http://localhost:3000
+Backend runs at http://localhost:8080/api/complaints  
 
 ---
 
