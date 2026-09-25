@@ -43,7 +43,33 @@ docker compose up --build -d
 
 ---
 
-## 3. Production Cloud Deployment Blueprint (AWS Architecture)
+## 3. Cloud Deployment (Render Blueprint)
+
+The repository provides a complete Infrastructure-as-Code Blueprint in [`render.yaml`](../render.yaml) for 1-click cloud provisioning.
+
+### 1-Click Cloud Deployment
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Harini410/Fullstack-complaint-portal)
+
+Clicking the button or importing `https://github.com/Harini410/Fullstack-complaint-portal` on [Render Blueprints](https://dashboard.render.com/blueprints) provisions:
+1. **`complaintdb`**: Managed PostgreSQL 16 database (Free tier).
+2. **`complaint-redis`**: Managed Key-Value store / Valkey-Redis cache with `allkeys-lru` eviction (Free tier, internal private network).
+3. **`complaint-backend`**: Multi-stage Docker container running Spring Boot 3.3.2 with `/actuator/health` probe (Free tier).
+4. **`complaint-frontend`**: Multi-stage Docker container running Nginx + React SPA with runtime environment injection (Free tier).
+
+### Kafka Architecture & Event Flow on Render
+- **Render Infrastructure Constraint:** Render does not provide a managed Kafka broker on its standard free tier.
+- **Architectural Resilience:** The application is architected with resilient decoupling via [`ComplaintEventPublisher.java`](../backend/src/main/java/com/example/complaintbackend/service/ComplaintEventPublisher.java).
+  - In local Docker Compose or environments with a running Kafka broker, domain events (`ComplaintCreatedEvent`, `ComplaintAssignedEvent`, `ComplaintStatusChangedEvent`) are published directly to the `complaint-events` topic.
+  - If a Kafka broker is unreachable or unconfigured in the cloud environment, `sendEvent()` catches broker connection timeouts gracefully, logs the event locally, and ensures the core business operation (complaint creation, assignment, status update) succeeds without breaking the user transaction.
+- **Connecting Cloud Kafka (Optional):** To stream events to a live cloud Kafka broker without running a dedicated cluster, attach a free serverless Kafka cluster (e.g., [Upstash Kafka](https://upstash.com/docs/kafka/overall/getstarted) or Confluent Cloud) by defining:
+  - `KAFKA_BOOTSTRAP_SERVERS`: `<upstash-endpoint>:9092`
+  - `spring.kafka.properties.security.protocol`: `SASL_SSL`
+  - `spring.kafka.properties.sasl.mechanism`: `SCRAM-SHA-256`
+  - `spring.kafka.properties.sasl.jaas.config`: `org.apache.kafka.common.security.scram.ScramLoginModule required username="..." password="...";`
+
+---
+
+## 4. Production Cloud Deployment Blueprint (Enterprise AWS Architecture)
 
 ```mermaid
 flowchart TD

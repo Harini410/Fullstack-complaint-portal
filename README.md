@@ -317,18 +317,30 @@ The repository includes an automated pipeline ([`.github/workflows/ci.yml`](.git
 
 ---
 
-## Cloud Deployment (Turnkey Ready)
+## Cloud Deployment (Render Blueprint)
 
-The application is cloud-ready and includes an Infrastructure-as-Code blueprint in [`render.yaml`](render.yaml):
-- **Managed PostgreSQL:** Pre-configured with automated schema migration.
-- **Managed Redis:** Configured with `allkeys-lru` eviction policy.
-- **Spring Boot Backend:** Containerized with health check probes on `/actuator/health`.
-- **Frontend SPA:** Auto-detects remote API host with dynamic reverse proxying.
+The application includes an automated Infrastructure-as-Code blueprint in [`render.yaml`](render.yaml):
 
-To deploy to Render or Railway:
-1. Push code to your GitHub repository.
-2. Connect repository to Render as a **Blueprint** using `render.yaml`.
-3. Provide environment variables for production secrets.
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Harini410/Fullstack-complaint-portal)
+
+### Services Provisioned on Render
+| Component | Service Name | Type | Plan | Details |
+| :--- | :--- | :--- | :--- | :--- |
+| **PostgreSQL** | `complaintdb` | Managed DB | Free | PostgreSQL 16 with automated Hibernate DDL schema generation |
+| **Redis** | `complaint-redis` | Key-Value | Free | In-memory cache with `allkeys-lru` eviction policy |
+| **Backend** | `complaint-backend` | Web Service | Free | Spring Boot 3.3.2 container with Actuator `/actuator/health` probe |
+| **Frontend** | `complaint-frontend` | Web Service | Free | React SPA served via Nginx with dynamic runtime API URL injection |
+
+### 1-Click Deployment Instructions:
+1. Click the **Deploy to Render** button above or navigate to [Render Blueprints](https://dashboard.render.com/blueprints).
+2. Connect repository: `Harini410/Fullstack-complaint-portal`.
+3. Render automatically validates `render.yaml` and lists all 4 services.
+4. Click **Apply** to provision and build the entire stack.
+
+### Kafka Event Flow & Cloud Broker Details:
+- **Render Infrastructure Constraint:** Render's free tier blueprint does not host a native Kafka broker.
+- **Resilient Fallback Mode:** The backend's [`ComplaintEventPublisher`](backend/src/main/java/com/example/complaintbackend/service/ComplaintEventPublisher.java) is non-blocking. If Kafka is unreachable in the cloud environment, events (`ComplaintCreatedEvent`, `ComplaintAssignedEvent`, `ComplaintStatusChangedEvent`) are logged cleanly and gracefully without failing core REST transactions.
+- **External Kafka Integration (Optional):** To stream events to a live cloud Kafka cluster, attach any free broker (e.g. Upstash Kafka or Confluent Cloud) by configuring `KAFKA_BOOTSTRAP_SERVERS` and SASL credentials in the backend environment variables.
 
 ---
 
