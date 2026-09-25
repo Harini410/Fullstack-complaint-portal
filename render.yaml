@@ -10,7 +10,7 @@ services:
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    plan: standard
+    plan: free
     region: oregon
     healthCheckPath: /actuator/health
     envVars:
@@ -38,19 +38,14 @@ services:
           property: password
       - key: REDIS_HOST
         fromService:
-          type: redis
+          type: keyvalue
           name: complaint-redis
           property: host
       - key: REDIS_PORT
         fromService:
-          type: redis
+          type: keyvalue
           name: complaint-redis
           property: port
-      - key: REDIS_PASSWORD
-        fromService:
-          type: redis
-          name: complaint-redis
-          property: password
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRATION_MS
@@ -71,6 +66,14 @@ services:
           name: complaint-backend
           property: url
 
+  # 3. Redis / Key-Value Store
+  - type: keyvalue
+    name: complaint-redis
+    plan: free
+    region: oregon
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
+
 # Managed Databases
 databases:
   - name: complaintdb
@@ -78,10 +81,3 @@ databases:
     user: postgres
     plan: free
     region: oregon
-
-# Managed Redis Cache
-redis:
-  - name: complaint-redis
-    plan: free
-    region: oregon
-    maxmemoryPolicy: allkeys-lru

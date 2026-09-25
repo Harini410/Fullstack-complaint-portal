@@ -28,6 +28,6 @@ COPY --from=builder /app/target/complaint-backend-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
 
 # Configure production JVM flags
-ENV JAVA_OPTS="-Xms256m -Xmx512m -XX:+UseG1GC"
+ENV JAVA_OPTS="-Xms128m -Xmx384m -XX:+UseG1GC"
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar app.jar"]

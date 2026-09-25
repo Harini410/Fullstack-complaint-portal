@@ -1,5 +1,23 @@
-const BASE_URL = process.env.REACT_APP_API_URL 
-  || (typeof window !== 'undefined' && window.location.port === '3000' && window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : '/api');
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined' && window._env_ && window._env_.REACT_APP_API_URL) {
+    const url = window._env_.REACT_APP_API_URL.trim();
+    if (url) {
+      return url.endsWith('/api') ? url : `${url.replace(/\/$/, '')}/api`;
+    }
+  }
+  if (process.env.REACT_APP_API_URL) {
+    const url = process.env.REACT_APP_API_URL.trim();
+    if (url) {
+      return url.endsWith('/api') ? url : `${url.replace(/\/$/, '')}/api`;
+    }
+  }
+  if (typeof window !== 'undefined' && window.location.port === '3000' && window.location.hostname === 'localhost') {
+    return 'http://localhost:8080/api';
+  }
+  return '/api';
+};
+
+const BASE_URL = getBaseUrl();
 
 // Helper to attach JWT Bearer token if user is logged in
 const getAuthHeaders = () => {

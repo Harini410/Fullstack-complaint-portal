@@ -18,5 +18,10 @@ FROM nginx:alpine
 COPY --from=builder /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Runtime dynamic environment injection for React
+RUN echo '#!/bin/sh' > /docker-entrypoint.d/30-env-config.sh && \
+    echo 'echo "window._env_ = { REACT_APP_API_URL: \"${REACT_APP_API_URL:-}\" };" > /usr/share/nginx/html/env-config.js' >> /docker-entrypoint.d/30-env-config.sh && \
+    chmod +x /docker-entrypoint.d/30-env-config.sh
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
