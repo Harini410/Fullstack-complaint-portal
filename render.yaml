@@ -1,0 +1,87 @@
+# ==============================================================================
+# Render Infrastructure-as-Code Blueprint
+# Automatic deployment specification for Smart Complaint Management Portal
+# ==============================================================================
+
+services:
+  # 1. Spring Boot Backend Web Service
+  - type: web
+    name: complaint-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: standard
+    region: oregon
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        fromDatabase:
+          name: complaintdb
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: complaintdb
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: complaintdb
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: complaintdb
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: complaintdb
+          property: password
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: complaint-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: complaint-redis
+          property: port
+      - key: REDIS_PASSWORD
+        fromService:
+          type: redis
+          name: complaint-redis
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION_MS
+        value: "86400000"
+
+  # 2. React + Nginx Frontend Service
+  - type: web
+    name: complaint-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    region: oregon
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: complaint-backend
+          property: url
+
+# Managed Databases
+databases:
+  - name: complaintdb
+    databaseName: complaintdb
+    user: postgres
+    plan: free
+    region: oregon
+
+# Managed Redis Cache
+redis:
+  - name: complaint-redis
+    plan: free
+    region: oregon
+    maxmemoryPolicy: allkeys-lru
