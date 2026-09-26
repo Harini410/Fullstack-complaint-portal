@@ -317,11 +317,21 @@ The repository includes an automated pipeline ([`.github/workflows/ci.yml`](.git
 
 ---
 
-## Cloud Deployment (Render Blueprint)
+## Cloud Deployment (Live on Render)
 
-The application includes an automated Infrastructure-as-Code blueprint in [`render.yaml`](render.yaml):
+The portal is actively deployed and running on Render using [`render.yaml`](render.yaml):
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Harini410/Fullstack-complaint-portal)
+
+### Verified Live Endpoints
+| Component | Live Endpoint | Status | Description |
+| :--- | :--- | :--- | :--- |
+| **Frontend Portal** | [https://complaint-frontend-w76x.onrender.com](https://complaint-frontend-w76x.onrender.com) | `HEALTHY` | React 18 SPA served via Nginx with dynamic runtime backend injection |
+| **Backend REST API** | [https://complaint-backend-86js.onrender.com](https://complaint-backend-86js.onrender.com) | `HEALTHY` | Spring Boot 3.3.2 core engine on Temurin 17 |
+| **Actuator Health** | [https://complaint-backend-86js.onrender.com/actuator/health](https://complaint-backend-86js.onrender.com/actuator/health) | `HEALTHY` | Liveness, readiness, PostgreSQL, and Redis probe |
+| **Swagger UI** | [https://complaint-backend-86js.onrender.com/swagger-ui/index.html](https://complaint-backend-86js.onrender.com/swagger-ui/index.html) | `HEALTHY` | Interactive OpenAPI 3.0 documentation & API playground |
+| **PostgreSQL Database** | `complaintdb` (Render Internal) | `AVAILABLE` | PostgreSQL 16 relational datastore with auto-generated schema |
+| **Redis Cache** | `complaint-redis` (Render Internal) | `AVAILABLE` | Valkey 7.2.4 cache for taxonomy & dashboard aggregations |
 
 ### Services Provisioned on Render
 | Component | Service Name | Type | Plan | Details |
@@ -331,15 +341,9 @@ The application includes an automated Infrastructure-as-Code blueprint in [`rend
 | **Backend** | `complaint-backend` | Web Service | Free | Spring Boot 3.3.2 container with Actuator `/actuator/health` probe |
 | **Frontend** | `complaint-frontend` | Web Service | Free | React SPA served via Nginx with dynamic runtime API URL injection |
 
-### 1-Click Deployment Instructions:
-1. Click the **Deploy to Render** button above or navigate to [Render Blueprints](https://dashboard.render.com/blueprints).
-2. Connect repository: `Harini410/Fullstack-complaint-portal`.
-3. Render automatically validates `render.yaml` and lists all 4 services.
-4. Click **Apply** to provision and build the entire stack.
-
 ### Kafka Event Flow & Cloud Broker Details:
 - **Render Infrastructure Constraint:** Render's free tier blueprint does not host a native Kafka broker.
-- **Resilient Fallback Mode:** The backend's [`ComplaintEventPublisher`](backend/src/main/java/com/example/complaintbackend/service/ComplaintEventPublisher.java) is non-blocking. If Kafka is unreachable in the cloud environment, events (`ComplaintCreatedEvent`, `ComplaintAssignedEvent`, `ComplaintStatusChangedEvent`) are logged cleanly and gracefully without failing core REST transactions.
+- **Resilient Fallback Mode:** The backend's [`ComplaintEventPublisher`](backend/src/main/java/com/example/complaintbackend/service/ComplaintEventPublisher.java) is configured with `spring.kafka.producer.properties.max.block.ms=3000`. When Kafka is unreachable in the cloud environment, domain events (`ComplaintCreatedEvent`, `ComplaintAssignedEvent`, `ComplaintStatusChangedEvent`) fail fast and are logged cleanly without blocking user transactions.
 - **External Kafka Integration (Optional):** To stream events to a live cloud Kafka cluster, attach any free broker (e.g. Upstash Kafka or Confluent Cloud) by configuring `KAFKA_BOOTSTRAP_SERVERS` and SASL credentials in the backend environment variables.
 
 ---

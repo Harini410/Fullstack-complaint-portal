@@ -50,7 +50,17 @@ The repository provides a complete Infrastructure-as-Code Blueprint in [`render.
 ### 1-Click Cloud Deployment
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Harini410/Fullstack-complaint-portal)
 
-Clicking the button or importing `https://github.com/Harini410/Fullstack-complaint-portal` on [Render Blueprints](https://dashboard.render.com/blueprints) provisions:
+### Live Verified Deployment on Render
+| Component | Live Endpoint | Status | Description |
+| :--- | :--- | :--- | :--- |
+| **Frontend Portal** | [https://complaint-frontend-w76x.onrender.com](https://complaint-frontend-w76x.onrender.com) | `HEALTHY` | React 18 SPA served via Nginx with dynamic runtime backend injection |
+| **Backend REST API** | [https://complaint-backend-86js.onrender.com](https://complaint-backend-86js.onrender.com) | `HEALTHY` | Spring Boot 3.3.2 core engine on Temurin 17 |
+| **Actuator Health** | [https://complaint-backend-86js.onrender.com/actuator/health](https://complaint-backend-86js.onrender.com/actuator/health) | `HEALTHY` | Liveness, readiness, PostgreSQL, and Redis probe |
+| **Swagger UI** | [https://complaint-backend-86js.onrender.com/swagger-ui/index.html](https://complaint-backend-86js.onrender.com/swagger-ui/index.html) | `HEALTHY` | Interactive OpenAPI 3.0 documentation & API playground |
+| **PostgreSQL Database** | `complaintdb` (Render Internal) | `AVAILABLE` | PostgreSQL 16 relational datastore with auto-generated schema |
+| **Redis Cache** | `complaint-redis` (Render Internal) | `AVAILABLE` | Valkey 7.2.4 cache for taxonomy & dashboard aggregations |
+
+### Services Provisioned via Blueprint
 1. **`complaintdb`**: Managed PostgreSQL 16 database (Free tier).
 2. **`complaint-redis`**: Managed Key-Value store / Valkey-Redis cache with `allkeys-lru` eviction (Free tier, internal private network).
 3. **`complaint-backend`**: Multi-stage Docker container running Spring Boot 3.3.2 with `/actuator/health` probe (Free tier).
