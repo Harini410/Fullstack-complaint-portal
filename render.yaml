@@ -64,7 +64,7 @@ services:
         fromService:
           type: web
           name: complaint-backend
-          property: url
+          envVarKey: RENDER_EXTERNAL_URL
 
   # 3. Redis / Key-Value Store
   - type: keyvalue
@@ -78,6 +78,5 @@ services:
 databases:
   - name: complaintdb
     databaseName: complaintdb
-    user: postgres
     plan: free
     region: oregon
